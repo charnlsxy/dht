@@ -82,7 +82,7 @@ func main() {
 			continue
 		}
 		for _,p := range peers{
-			w.Request([]byte("a95389905bda001d2dc688a1f71e18e736fe5efc"), p.IP.String(), p.Port)
+			w.Request([]byte(hex.EncodeToString([]byte("a95389905bda001d2dc688a1f71e18e736fe5efc"))), p.IP.String(), p.Port)
 		}
 	}
 
