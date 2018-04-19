@@ -377,6 +377,7 @@ func (wire *Wire) Run() {
 				string(r.InfoHash), genAddress(r.IP, r.Port),
 			}, ":")
 
+			logft.Infof("checking")
 			if len(r.InfoHash) != 20 || wire.blackList.in(r.IP, r.Port) ||
 				wire.queue.Has(key) {
 				return

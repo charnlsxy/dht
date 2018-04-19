@@ -81,7 +81,6 @@ func main() {
 			time.Sleep(time.Second * 1)
 			continue
 		}
-		fmt.Println("Found peers:", peers[0].IP.String())
 		for _,p := range peers{
 			w.Request([]byte("a95389905bda001d2dc688a1f71e18e736fe5efc"), p.IP.String(), p.Port)
 		}
