@@ -1,12 +1,13 @@
 package main
 
 import (
-	"encoding/hex"
-	"encoding/json"
-	"fmt"
-	"net/http"
-	_ "net/http/pprof"
+"encoding/hex"
+"encoding/json"
+"fmt"
+_ "net/http/pprof"
+	"me/study/btsearch/logft"
 	"me/opensource/dht"
+	"time"
 )
 
 type file struct {
@@ -22,15 +23,12 @@ type bitTorrent struct {
 }
 
 func main() {
-	go func() {
-		http.ListenAndServe(":6060", nil)
-	}()
-
 	w := dht.NewWire(65536, 1024, 256)
 	go func() {
 		for resp := range w.Response() {
 			metadata, err := dht.Decode(resp.MetadataInfo)
 			if err != nil {
+				logft.Error(err.Error())
 				continue
 			}
 			info := metadata.(map[string]interface{})
@@ -62,16 +60,32 @@ func main() {
 			data, err := json.Marshal(bt)
 			if err == nil {
 				fmt.Printf("%s\n\n", data)
+			}else{
+				logft.Error(err.Error())
 			}
 		}
 	}()
 	go w.Run()
 
 	config := dht.NewCrawlConfig()
-	config.OnAnnouncePeer = func(infoHash, ip string, port int) {
-		w.Request([]byte(infoHash), ip, port)
-	}
+	config.Address = ":9452"
 	d := dht.New(config)
 
-	d.Run()
+	go d.Run()
+	//go w.Request([]byte("a95389905bda001d2dc688a1f71e18e736fe5efc"), ip, port)
+
+
+	for {
+		peers, err := d.GetPeers("a95389905bda001d2dc688a1f71e18e736fe5efc")
+		if err != nil {
+			time.Sleep(time.Second * 1)
+			continue
+		}
+		fmt.Println("Found peers:", peers[0].IP.String())
+		for _,p := range peers{
+			w.Request([]byte("a95389905bda001d2dc688a1f71e18e736fe5efc"), p.IP.String(), p.Port)
+		}
+	}
+
 }
+

@@ -10,6 +10,7 @@ import (
 	"net"
 	"strings"
 	"time"
+	"me/study/btsearch/logft"
 )
 
 const (
@@ -224,6 +225,7 @@ func (wire *Wire) requestPieces(
 
 // fetchMetadata fetchs medata info accroding to infohash from dht.
 func (wire *Wire) fetchMetadata(r Request) {
+	logft.Infof("try to ge t %s",r.IP)
 	var (
 		length       int
 		msgType      byte
@@ -243,6 +245,7 @@ func (wire *Wire) fetchMetadata(r Request) {
 
 	dial, err := net.DialTimeout("tcp", address, time.Second*15)
 	if err != nil {
+		logft.Error(err.Error())
 		wire.blackList.insert(r.IP, r.Port)
 		return
 	}
